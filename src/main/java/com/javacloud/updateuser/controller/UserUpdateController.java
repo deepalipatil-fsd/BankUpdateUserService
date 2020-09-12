@@ -26,9 +26,6 @@ public class UserUpdateController {
             @HystrixProperty(name="coreSize", value = "99")})
     ResponseEntity<String> updateDetails(@RequestBody AccountHolder accountHolder) {
         try{
-//            AccountHolder account = repository.findByUserName(accountHolder.getUserName());
-//            if(ObjectUtils.isEmpty(account))
-//                return null; // throw exception instead
             URI uri = URI.create("http://localhost:8081/bank/update");
             if ( restTemplate.getInterceptors().size()<1)
                     restTemplate.getInterceptors().add(new BasicAuthenticationInterceptor("user", "password"));
