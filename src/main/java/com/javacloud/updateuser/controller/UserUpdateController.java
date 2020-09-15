@@ -7,10 +7,7 @@ import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.http.HttpStatus;
 import org.springframework.http.ResponseEntity;
 import org.springframework.http.client.support.BasicAuthenticationInterceptor;
-import org.springframework.web.bind.annotation.PostMapping;
-import org.springframework.web.bind.annotation.RequestBody;
-import org.springframework.web.bind.annotation.RequestMapping;
-import org.springframework.web.bind.annotation.RestController;
+import org.springframework.web.bind.annotation.*;
 import org.springframework.web.client.RestTemplate;
 
 import java.net.URI;
@@ -20,15 +17,16 @@ import java.net.URI;
 public class UserUpdateController {
     @Autowired
     private RestTemplate restTemplate;
+    BasicAuthenticationInterceptor authInterceptor = new BasicAuthenticationInterceptor("user", "password");
 
     @PostMapping("/update")
     @HystrixCommand(fallbackMethod = "reliable", threadPoolProperties = {
             @HystrixProperty(name="coreSize", value = "99")})
     ResponseEntity<String> updateDetails(@RequestBody AccountHolder accountHolder) {
         try{
-            URI uri = URI.create("http://localhost:8081/bank/update");
-            if ( restTemplate.getInterceptors().size()<1)
-                    restTemplate.getInterceptors().add(new BasicAuthenticationInterceptor("user", "password"));
+            URI uri = URI.create("http://bank-registration-service/bank/update");
+            if ( !restTemplate.getInterceptors().contains(authInterceptor))
+                restTemplate.getInterceptors().add(authInterceptor);
             restTemplate.postForObject(uri, accountHolder, AccountHolder.class);
             return new ResponseEntity("Update successful", HttpStatus.OK);
         } catch (Exception e) {
@@ -41,5 +39,10 @@ public class UserUpdateController {
         System.out.println("real exception : {}"+ exception.getAccountNumber());
         return  new ResponseEntity("Service unavailable!!", HttpStatus.FORBIDDEN);
     }
-
+    @GetMapping("/{accountNumber}")
+    AccountHolder getAccount(@PathVariable("accountNumber") String accountNumber) {
+        if ( !restTemplate.getInterceptors().contains(authInterceptor))
+            restTemplate.getInterceptors().add(authInterceptor);
+        return restTemplate.getForObject("http://bank-registration-service/bank/accountdetails/"+accountNumber, AccountHolder.class);
+    }
 }
