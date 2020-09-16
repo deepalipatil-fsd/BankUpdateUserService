@@ -16,6 +16,7 @@ public class UpdateuserApplication {
 
 	public static void main(String[] args) {
 		SpringApplication.run(UpdateuserApplication.class, args);
+		//System.out.println(EncryptionUtil.encrypt("password"));
 	}
 
 	@Bean

@@ -34,8 +34,7 @@ public class UserUpdateController {
         return bankUserDetailsService.registerUser(accountHolder);
     }
 
-    public ResponseEntity<String> reliable(AccountHolder exception) {
-        System.out.println("real exception : {}"+ exception.getAccountNumber());
+    public ResponseEntity<String> reliable(AccountHolder account) {
         return  new ResponseEntity("Service unavailable!!", HttpStatus.FORBIDDEN);
     }
 
@@ -48,6 +47,8 @@ public class UserUpdateController {
     }
     @PostMapping("/loan/apply")
     ResponseEntity<LoanDetails> applyForLoan(@RequestBody LoanDetails loanDetails) {
+        if(ObjectUtils.isEmpty(bankUserDetailsService.getAccount(loanDetails.getAccountNumber())))
+            return new ResponseEntity("Account not available hence cant apply for loan.", HttpStatus.BAD_REQUEST);
        return bankUserDetailsService.applyForLoan(loanDetails);
     }
 
@@ -55,7 +56,7 @@ public class UserUpdateController {
     ResponseEntity<List<LoanDetails>> getLoanDetails(@PathVariable("accountNumber") String accountNumber) {
         List<LoanDetails> loanDetails = bankUserDetailsService.getLoanDetails(accountNumber);
         if(ObjectUtils.isEmpty(loanDetails))
-            return new ResponseEntity("Loan details not found", HttpStatus.BAD_REQUEST);
+            return new ResponseEntity("Loan details not found.", HttpStatus.BAD_REQUEST);
         return new ResponseEntity(loanDetails, HttpStatus.OK);
     }
 }

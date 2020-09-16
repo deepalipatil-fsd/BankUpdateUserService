@@ -1,5 +1,6 @@
 package com.javacloud.updateuser.model;
 
+import com.javacloud.updateuser.util.EncryptionUtil;
 import lombok.Data;
 import org.springframework.security.core.GrantedAuthority;
 import org.springframework.security.core.authority.SimpleGrantedAuthority;
@@ -27,7 +28,7 @@ public class BankUser implements UserDetails {
 
     @Override
     public String getPassword() {
-        return accountHolder.getPassword();
+        return EncryptionUtil.decrypt(accountHolder.getPassword());
     }
 
     @Override
