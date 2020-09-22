@@ -61,6 +61,7 @@ public class BankUserDetailsService implements UserDetailsService {
     public ResponseEntity<String> updateAccount(AccountHolder accountHolder) {
         try{
             URI uri = URI.create(Constants.BANK_UPDATE_USER_URL);
+            accountHolder.setPassword(EncryptionUtil.encrypt(accountHolder.getPassword()));
             restTemplate.postForObject(uri, accountHolder, AccountHolder.class);
             return new ResponseEntity("Update successful", HttpStatus.OK);
         } catch (Exception e) {
